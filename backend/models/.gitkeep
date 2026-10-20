@@ -1,0 +1,4 @@
+# Place model files here:
+# - best_model.pth
+# - classes.json (or class_names.json)
+# - calibration.json (optional)

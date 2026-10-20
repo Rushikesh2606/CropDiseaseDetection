@@ -1,0 +1,26 @@
+# PlantGuard AI — Backend Dependencies
+
+# Deep Learning (CPU)
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
+
+# FastAPI
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# Image Processing
+Pillow==11.1.0
+
+# Scientific Computing (Python 3.13 requires >=2.1.0 and >=1.14.1 for prebuilt wheels)
+numpy>=2.1.0
+scipy>=1.14.1
+
+# Testing
+pytest==8.3.5
+pytest-asyncio==0.25.3
+httpx==0.28.1
+
+# Configuration
+python-dotenv==1.0.1

@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+backend/venv/
+backend/env/
+.venv/
+env/
+venv/
+
+# Production build artifacts
+dist/
+dist-ssr/
+frontend/dist/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and local settings
+.env
+.env.local
+.env.*.local
+*.local
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary task / scratch dumps
+q_*.txt
+task_spec_extracted.txt

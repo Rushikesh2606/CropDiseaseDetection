@@ -1,0 +1,960 @@
+/* ==========================================================================
+   src/styles/hero.css
+   PlantGuard AI — Spec-exact hero CSS (spec values verbatim)
+   NAMESPACED: every selector prefixed .pg-* to prevent leaking into inner pages
+   UNLAYERED: imported AFTER Tailwind so these rules beat Tailwind's layered styles
+   Import order in main.jsx: index.css (Tailwind) THEN hero.css
+   ==========================================================================
+
+   Source tags:
+   [SPEC]     = copied verbatim from HERO_SPEC
+   [OVERRIDE] = content registry (section 2 of task)
+   [ASSUMED]  = values not given in spec; listed in ASSUMED VALUES block
+   ========================================================================== */
+
+/* ── Google Fonts — import at top so @font-face fallbacks work ──────────── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Urbanist:wght@600&display=swap');
+
+/* ── Root fallback: defines --u and all --pg-* tokens globally so inner-page
+   header (which renders outside .pg-stage) can use the same design tokens.
+   At 1280px viewport --u = 1px; on inner pages we use a fixed 1px baseline.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --u: max(0.62px, min(100vw / 1280, 100dvh / 960));
+
+  /* Colors */
+  --pg-bg:         #03080B;
+  --pg-ink:        #F5FAF6;
+  --pg-ink-2:      #ECF1EF;
+  --pg-teal:       #88DECC;
+  --pg-icon-teal:  #7EC4B5;
+  --pg-chevron:    #7CCBBA;
+  --pg-moth:       #315352;
+  --pg-cream:      #EEF1EA;
+  --pg-pine:       #122B2A;
+  --pg-logo-disc:  #030909;
+
+  /* Font stacks */
+  --pg-font-display: "RV Display", "Poppins", "Helvetica Neue", Arial, sans-serif;
+  --pg-font-brand:   "RV Brand", "Urbanist", "Helvetica Neue", Arial, sans-serif;
+  --pg-font-text:    "RV Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Easings */
+  --pg-ease-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+  --pg-ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --pg-ease-grow:   cubic-bezier(0.45, 0, 0.2, 1);
+  --pg-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Pill dimensions */
+  --pg-nav-pill-w: calc(var(--u) * 442);
+  --pg-nav-pill-h: calc(var(--u) * 47);
+  --pg-logo-pill-w: calc(var(--u) * 104);
+  --pg-logo-pill-h: calc(var(--u) * 46);
+  --pg-logo-disc-sz: calc(var(--u) * 46);
+  --pg-sound-sz: calc(var(--u) * 48);
+  --pg-pill-r: 9999px;
+
+  /* Header padding */
+  --pg-header-py: calc(var(--u) * 26);
+  --pg-header-px: calc(var(--u) * 48);
+}
+
+/* ── @font-face [SPEC: RV Display 300, RV Brand 600, RV Text 400, font-display:block] ── */
+@font-face {
+  font-family: "RV Display";
+  font-weight: 300;
+  font-display: block; /* [SPEC] */
+  src: url("/assets/fonts/rv-display.woff2") format("woff2");
+}
+@font-face {
+  font-family: "RV Brand";
+  font-weight: 600;
+  font-display: block; /* [SPEC] */
+  src: url("/assets/fonts/rv-brand.woff2") format("woff2");
+}
+@font-face {
+  font-family: "RV Text";
+  font-weight: 400;
+  font-display: block; /* [SPEC] */
+  src: url("/assets/fonts/rv-text.woff2") format("woff2");
+}
+
+/* ── Custom properties on the hero stage root [SPEC] ─────────────────────── */
+.pg-stage {
+  /* Unit [SPEC] */
+  --u: max(0.62px, min(100vw / 1280, 100dvh / 960));
+
+  /* Colors [SPEC] */
+  --pg-bg:         #03080B;
+  --pg-ink:        #F5FAF6;
+  --pg-ink-2:      #ECF1EF;
+  --pg-teal:       #88DECC;
+  --pg-icon-teal:  #7EC4B5;
+  --pg-chevron:    #7CCBBA;
+  --pg-moth:       #315352;
+  --pg-cream:      #EEF1EA;
+  --pg-pine:       #122B2A;
+  --pg-logo-disc:  #030909;
+
+  /* Font stacks [SPEC: exact fallback stacks] */
+  --pg-font-display: "RV Display", "Poppins", "Helvetica Neue", Arial, sans-serif;
+  --pg-font-brand:   "RV Brand", "Urbanist", "Helvetica Neue", Arial, sans-serif;
+  --pg-font-text:    "RV Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Easings [SPEC names; values from spec script section] */
+  --pg-ease-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+  --pg-ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --pg-ease-grow:   cubic-bezier(0.45, 0, 0.2, 1);
+  --pg-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Pill dimensions [SPEC] */
+  --pg-nav-pill-w: calc(var(--u) * 442);
+  --pg-nav-pill-h: calc(var(--u) * 47);
+  --pg-logo-pill-w: calc(var(--u) * 104);
+  --pg-logo-pill-h: calc(var(--u) * 46);
+  --pg-logo-disc-sz: calc(var(--u) * 46);
+  --pg-sound-sz: calc(var(--u) * 48);
+  --pg-pill-r: 9999px;
+
+  /* ===== ASSUMED VALUES ===== */
+  /* Header padding [ASSUMED: from 1280×960 reference proportions] */
+  --pg-header-py: calc(var(--u) * 26);
+  --pg-header-px: calc(var(--u) * 48);
+
+  /* Headline size [ASSUMED: longest line "A Healthier Harvest" ≈ 42% of 1280 reference width at 68px] */
+  --pg-title-size: clamp(2.2rem, calc(var(--u) * 68), 4.5rem);
+  --pg-title-lh: 0.92;
+
+  /* Per-line tracking [ASSUMED: typographic choice per line character] */
+  --pg-ls-1: -0.03em;
+  --pg-ls-2: -0.01em;
+  --pg-ls-3: -0.05em;
+
+  /* Hero content positioning [ASSUMED] */
+  --pg-content-bottom: calc(var(--u) * 120);
+  --pg-content-left:   calc(var(--u) * 48);
+  --pg-content-maxw:   calc(var(--u) * 820);
+  --pg-content-gap:    calc(var(--u) * 28);
+}
+
+/* ── Stage [SPEC: exactly 100dvh, overflow hidden, no letterboxing] ─────── */
+.pg-stage {
+  position: relative;
+  width: 100vw;
+  height: 100dvh; /* [SPEC: exactly 100dvh] */
+  overflow: hidden; /* [SPEC: overflow hidden] */
+  background: var(--pg-bg);
+  /* Fix Tailwind Preflight: ensure box-sizing is correct */
+  box-sizing: border-box;
+}
+
+/* ── Video [SPEC: object-fit cover, pointer-events none, position 50% 40%] ─ */
+.pg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* [SPEC] */
+  object-position: 50% 40%; /* [SPEC] */
+  pointer-events: none; /* [SPEC] */
+  z-index: 0;
+  /* Fix Preflight: video display */
+  display: block;
+}
+@media (min-aspect-ratio: 16/9) {
+  .pg-video { object-position: 50% 24%; } /* [SPEC] */
+}
+
+/* ── Shade layers [SPEC: three overlays] ─────────────────────────────────── */
+.pg-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Horizontal gradient [SPEC: alpha .683,.595,.458,.221,.039,.054 at 0,20,40,60,80,100%] */
+.pg-shade--horiz {
+  background: linear-gradient(
+    to right,
+    rgba(3,8,11, 0.683) 0%,
+    rgba(3,8,11, 0.595) 20%,
+    rgba(3,8,11, 0.458) 40%,
+    rgba(3,8,11, 0.221) 60%,
+    rgba(3,8,11, 0.039) 80%,
+    rgba(3,8,11, 0.054) 100%
+  );
+}
+
+/* Vertical gradient [SPEC: alpha .060,.023,.152,.300,.394,.632 at same stops] */
+.pg-shade--vert {
+  background: linear-gradient(
+    to bottom,
+    rgba(3,8,11, 0.060) 0%,
+    rgba(3,8,11, 0.023) 20%,
+    rgba(3,8,11, 0.152) 40%,
+    rgba(3,8,11, 0.300) 60%,
+    rgba(3,8,11, 0.394) 80%,
+    rgba(3,8,11, 0.632) 100%
+  );
+}
+
+/* Bottom-left radial [SPEC: 93.8% by 41.3% at 0% 100%, shade 1→0] */
+.pg-shade--radial {
+  background: radial-gradient(
+    ellipse 93.8% 41.3% at 0% 100%,
+    rgba(3,8,11, 1.0) 0%,
+    rgba(3,8,11, 0.0) 100%
+  );
+}
+
+/* ── Header [SPEC positions in --u] ─────────────────────────────────────── */
+.pg-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pg-header-py) var(--pg-header-px); /* [ASSUMED] */
+  gap: calc(var(--u) * 16); /* [ASSUMED] */
+  /* Fix Preflight: ensure header is not block-displayed and resets correctly */
+  box-sizing: border-box;
+}
+
+/* Inner-page header — sticky glass bar (not inside .pg-stage) */
+.pg-header--inner {
+  position: sticky;
+  top: 0;
+  background: rgba(3, 8, 11, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(136, 222, 204, 0.08);
+  z-index: 30;
+}
+
+/* ── Logo pill [SPEC: 104×46 glass, rgba(150,220,130,.035), blur 12] ───── */
+.pg-logo-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--pg-logo-pill-w);
+  height: var(--pg-logo-pill-h);
+  background: rgba(150, 220, 130, 0.035); /* [SPEC] */
+  backdrop-filter: blur(12px); /* [SPEC] */
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--pg-pill-r);
+  text-decoration: none; /* Fix Preflight anchor reset */
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid rgba(136, 222, 204, 0.12); /* [ASSUMED: subtle border] */
+  padding-right: calc(var(--u) * 6);
+  outline: none;
+}
+.pg-logo-pill:focus-visible {
+  outline: 2px solid var(--pg-teal); /* [SPEC: 2px teal focus-visible] */
+  outline-offset: 2px;
+}
+
+/* Disc [SPEC: 46px disc, #030909] */
+.pg-logo-disc {
+  width: var(--pg-logo-disc-sz);
+  height: var(--pg-logo-disc-sz);
+  background: var(--pg-logo-disc); /* [SPEC] */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Tree SVG [SPEC: viewBox 0 0 46 46, stroke #7CC6B5, width 1.6] */
+.pg-logo-tree {
+  width: var(--pg-logo-disc-sz);
+  height: var(--pg-logo-disc-sz);
+  /* Fix Preflight: SVG display */
+  display: block;
+  overflow: visible;
+}
+
+/* Moth [SPEC: viewBox 0 0 39 30] */
+.pg-logo-moth {
+  width: calc(var(--u) * 39);
+  height: calc(var(--u) * 30);
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Brand text [OVERRIDE: "PlantGuard AI"; SPEC: RV Brand, teal] */
+.pg-brand-text {
+  font-family: var(--pg-font-brand);
+  font-size: calc(var(--u) * 14); /* [ASSUMED] */
+  font-weight: 600;
+  color: var(--pg-teal);
+  letter-spacing: -0.01em; /* [ASSUMED] */
+  line-height: 1;
+  padding: 0 calc(var(--u) * 10); /* [ASSUMED] */
+  white-space: nowrap;
+}
+
+/* ── Nav pill [SPEC: black 442×47] ──────────────────────────────────────── */
+.pg-nav-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: var(--pg-nav-pill-w);
+  height: var(--pg-nav-pill-h);
+  background: #000; /* [SPEC: black] */
+  border-radius: var(--pg-pill-r);
+  flex-shrink: 0;
+  overflow: visible;
+  padding: 0 calc(var(--u) * 4); /* [ASSUMED] */
+  /* Fix Preflight: nav element */
+  box-sizing: border-box;
+}
+
+.pg-nav-links {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0; /* [ASSUMED: links are evenly spaced] */
+}
+
+/* Nav links [SPEC: font-text] */
+.pg-nav-link {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 13); /* [ASSUMED] */
+  font-weight: 400;
+  color: var(--pg-ink-2);
+  text-decoration: none; /* Fix Preflight anchor */
+  white-space: nowrap;
+  padding: 0 calc(var(--u) * 9); /* [ASSUMED] */
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 4); /* [ASSUMED] */
+  height: 100%;
+  transition: color 0.2s;
+  outline: none;
+  line-height: 1; /* Fix Preflight line-height reset */
+}
+/* [SPEC: hover text #88DECC] — v4: hover only on hover-capable devices */
+@media (hover: hover) {
+  .pg-nav-link:hover { color: var(--pg-teal); }
+}
+.pg-nav-link:focus-visible {
+  outline: 2px solid var(--pg-teal); /* [SPEC] */
+  outline-offset: 2px;
+}
+.pg-nav-link[aria-current="page"] { color: var(--pg-ink); }
+
+/* Chevron SVG [SPEC: M.7.7 5.5 5.3 10.3.7] */
+.pg-nav-chevron {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Cream pill [SPEC: cream, dark disc, white arrow; OVERRIDE: "Analyze Leaf" → /analyze] */
+.pg-partner-pill {
+  display: flex;
+  align-items: center;
+  height: calc(var(--u) * 35); /* [ASSUMED] */
+  background: var(--pg-cream); /* [SPEC] */
+  border-radius: var(--pg-pill-r);
+  margin-left: calc(var(--u) * 4); /* [ASSUMED] */
+  text-decoration: none; /* Fix Preflight */
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: background 0.2s;
+  outline: none;
+}
+@media (hover: hover) {
+  .pg-partner-pill:hover { background: var(--pg-teal); } /* [ASSUMED: consistent hover] */
+  .pg-partner-pill:hover .pg-partner-disc { background: #26504d; } /* [SPEC: hover discs #26504d] */
+}
+.pg-partner-pill:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 2px;
+}
+.pg-partner-disc {
+  width: calc(var(--u) * 35); /* [ASSUMED] */
+  height: calc(var(--u) * 35);
+  background: var(--pg-pine); /* [SPEC: pine discs] */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.pg-partner-text {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 13); /* [ASSUMED] */
+  font-weight: 600;
+  color: var(--pg-pine);
+  padding: 0 calc(var(--u) * 12) 0 calc(var(--u) * 8); /* [ASSUMED] */
+  white-space: nowrap;
+}
+
+/* ── Header right cluster ────────────────────────────────────────────────── */
+.pg-header-right {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 10); /* [ASSUMED] */
+  flex-shrink: 0;
+}
+
+/* ── Sound button [SPEC: 48px blurred dark circle] ─────────────────────── */
+.pg-sound-btn {
+  position: relative;
+  width: var(--pg-sound-sz); /* [SPEC: 48px] */
+  height: var(--pg-sound-sz);
+  border-radius: 50%;
+  background: rgba(3,8,11,0.7); /* [SPEC: blurred dark] */
+  backdrop-filter: blur(12px); /* [SPEC: blurred] */
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(136,222,204,0.15); /* [ASSUMED] */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pg-ink-2);
+  flex-shrink: 0;
+  transition: color 0.2s;
+  /* Fix Preflight: button resets */
+  padding: 0;
+  background-clip: padding-box;
+  font: inherit;
+  line-height: 1;
+  outline: none;
+}
+@media (hover: hover) {
+  .pg-sound-btn:hover { color: var(--pg-teal); }
+}
+.pg-sound-btn:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 2px;
+}
+/* [SPEC: aria-pressed=false waves at opacity .25] */
+.pg-sound-btn[aria-pressed="false"] .pg-sound-wave { opacity: 0.25; }
+.pg-sound-btn[aria-pressed="true"]  .pg-sound-wave { opacity: 0.9; }
+
+/* Sound waves (CSS) */
+.pg-sound-waves {
+  position: absolute;
+  right: calc(var(--u) * -20); /* [ASSUMED] */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.pg-sound-wave {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--pg-teal);
+  animation: pgSoundWave 0.9s ease-in-out infinite alternate;
+  transition: opacity 0.3s;
+}
+.pg-sound-wave:nth-child(1) { height: 8px; animation-delay: 0s; }
+.pg-sound-wave:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+@keyframes pgSoundWave {
+  from { transform: scaleY(0.4); }
+  to   { transform: scaleY(1.0); }
+}
+
+/* ── Mobile menu button [SPEC: hidden desktop, 48px] ───────────────────── */
+.pg-menu-btn {
+  display: none;
+  width: var(--pg-sound-sz); /* [SPEC: 48px] */
+  height: var(--pg-sound-sz);
+  border-radius: 50%; /* [ASSUMED: circular] */
+  background: #000; /* [SPEC: black menu button] */
+  border: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pg-ink);
+  flex-shrink: 0;
+  /* Fix Preflight: button resets */
+  padding: 0;
+  font: inherit;
+  line-height: 1;
+  outline: none;
+}
+.pg-menu-btn:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 2px;
+}
+
+/* API Status pill (React only, not in spec) */
+.pg-api-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: calc(var(--u) * 11); /* [ASSUMED] */
+  font-weight: 500;
+  font-family: var(--pg-font-text);
+  color: var(--pg-ink-2);
+  background: rgba(3,8,11,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(136,222,204,0.18);
+  border-radius: var(--pg-pill-r);
+  padding: 0.2rem 0.7rem 0.2rem 0.5rem;
+  white-space: nowrap;
+}
+.pg-api-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pg-api-dot--online  { background: #4ade80; }
+.pg-api-dot--offline { background: #f87171; }
+.pg-api-dot--checking {
+  background: var(--pg-teal);
+  animation: pgPulse 1.4s ease-in-out infinite;
+}
+@keyframes pgPulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ── Hero content (bottom-left) [SPEC] ─────────────────────────────────── */
+.pg-hero-content {
+  position: absolute;
+  bottom: var(--pg-content-bottom); /* [ASSUMED] */
+  left: var(--pg-content-left);    /* [ASSUMED] */
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pg-content-gap);       /* [ASSUMED] */
+  max-width: var(--pg-content-maxw); /* [ASSUMED] */
+}
+
+/* Hero brand (below header) [OVERRIDE; SPEC: RV Brand, teal] */
+.pg-hero-brand {
+  font-family: var(--pg-font-brand);
+  font-size: calc(var(--u) * 20); /* [ASSUMED] */
+  font-weight: 600;
+  color: var(--pg-teal);
+  line-height: 1;
+  letter-spacing: -0.01em; /* [ASSUMED] */
+}
+
+/* ── Headline [SPEC: 3 lines, light, nowrap, per-line clip mask] ─────────── */
+.pg-title {
+  font-family: var(--pg-font-display);
+  font-size: var(--pg-title-size);
+  font-weight: 300; /* [SPEC: light weight] */
+  line-height: var(--pg-title-lh);
+  color: var(--pg-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* Fix Preflight: heading resets */
+  margin: 0;
+  padding: 0;
+}
+
+/* Each line has its own clip-mask [SPEC] */
+.pg-title__line {
+  display: block;
+  white-space: nowrap; /* [SPEC: nowrap] */
+  overflow: hidden;    /* clip mask */
+  line-height: var(--pg-title-lh);
+}
+
+/* Inner span carries the transform for animation */
+.pg-title__line-inner {
+  display: block;
+}
+
+/* Per-line letter-spacing [ASSUMED] */
+.pg-title__line:nth-child(1) .pg-title__line-inner { letter-spacing: var(--pg-ls-1); }
+.pg-title__line:nth-child(2) .pg-title__line-inner { letter-spacing: var(--pg-ls-2); }
+.pg-title__line:nth-child(3) .pg-title__line-inner { letter-spacing: var(--pg-ls-3); }
+
+/* ── Lede [SPEC: two lines] ─────────────────────────────────────────────── */
+.pg-lede {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 18); /* [ASSUMED] */
+  font-weight: 400;
+  color: var(--pg-ink-2);
+  line-height: 1.6; /* [ASSUMED] */
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 4); /* [ASSUMED] */
+  /* Fix Preflight: paragraph resets */
+  margin: 0;
+  padding: 0;
+}
+
+.pg-lede__line { display: block; }
+
+/* ── CTA cluster [SPEC: pill + text link] ─────────────────────────────── */
+.pg-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 24); /* [ASSUMED] */
+}
+
+/* CTA pill [SPEC: dark disc + white chevron; OVERRIDE: "Analyze a Leaf" → /analyze] */
+.pg-cta-pill {
+  display: flex;
+  align-items: center;
+  background: var(--pg-cream); /* [SPEC] */
+  border-radius: var(--pg-pill-r);
+  text-decoration: none; /* Fix Preflight */
+  overflow: hidden;
+  transition: background 0.2s;
+  outline: none;
+}
+@media (hover: hover) {
+  .pg-cta-pill:hover { background: var(--pg-teal); }
+  .pg-cta-pill:hover .pg-cta-disc { background: #26504d; } /* [SPEC: hover discs #26504d] */
+}
+.pg-cta-pill:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 3px;
+}
+
+.pg-cta-disc {
+  width: calc(var(--u) * 46); /* [ASSUMED: ~pill height] */
+  height: calc(var(--u) * 46);
+  background: var(--pg-pine); /* [SPEC: pine discs] */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.pg-cta-text {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 15); /* [ASSUMED] */
+  font-weight: 600;
+  color: var(--pg-pine);
+  padding: 0 calc(var(--u) * 20) 0 calc(var(--u) * 12); /* [ASSUMED] */
+  white-space: nowrap;
+  line-height: 1; /* Fix Preflight */
+}
+
+/* Text link [SPEC: hover #88DECC; OVERRIDE: "Browse Diseases" → /diseases] */
+.pg-text-link {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 15); /* [ASSUMED] */
+  font-weight: 400;
+  color: var(--pg-ink-2);
+  text-decoration: none; /* Fix Preflight */
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 6); /* [ASSUMED] */
+  transition: color 0.2s;
+  padding: calc(var(--u) * 8) 0; /* [SPEC: touch padding mobile] */
+  outline: none;
+  line-height: 1; /* Fix Preflight */
+}
+@media (hover: hover) {
+  .pg-text-link:hover { color: var(--pg-teal); } /* [SPEC] */
+}
+.pg-text-link:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 2px;
+}
+
+/* ── Scroll cue [SPEC: bottom-right, teal chevron; hover #88DECC] ────────── */
+.pg-scroll-cue {
+  position: absolute;
+  bottom: calc(var(--u) * 48); /* [ASSUMED] */
+  right: calc(var(--u) * 48);  /* [SPEC: bottom-right] */
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 8); /* [ASSUMED] */
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none; /* Fix Preflight anchor */
+  color: var(--pg-ink-2);
+  padding: calc(var(--u) * 8); /* [SPEC: touch padding mobile] */
+  transition: color 0.2s;
+  outline: none;
+}
+@media (hover: hover) {
+  .pg-scroll-cue:hover { color: var(--pg-teal); } /* [SPEC] */
+}
+.pg-scroll-cue:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: 2px;
+}
+
+.pg-scroll-cue__label {
+  font-family: var(--pg-font-text);
+  font-size: calc(var(--u) * 11); /* [ASSUMED] */
+  font-weight: 400;
+  letter-spacing: 0.1em; /* [ASSUMED] */
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  line-height: 1; /* Fix Preflight */
+}
+
+.pg-scroll-cue__chevron {
+  color: var(--pg-teal); /* [SPEC: teal chevron] */
+  /* Fix Preflight: SVG display */
+  display: block;
+}
+
+/* ── Mobile menu panel [SPEC: black rounded, .is-open, links 48px / 17px] ── */
+.pg-mobile-nav {
+  display: none;
+  position: absolute;
+  top: calc(var(--u) * 90); /* [ASSUMED: below header] */
+  left: calc(var(--u) * 18);
+  right: calc(var(--u) * 18);
+  z-index: 40;
+  background: #000; /* [SPEC: black] */
+  border-radius: calc(var(--u) * 16); /* [ASSUMED] */
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+}
+.pg-mobile-nav.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.pg-mobile-nav__link {
+  display: flex;
+  align-items: center;
+  height: 48px; /* [SPEC: 48px tall] */
+  padding: 0 20px; /* [ASSUMED] */
+  font-family: var(--pg-font-text);
+  font-size: 17px; /* [SPEC: 17px type] */
+  font-weight: 400;
+  color: var(--pg-ink-2);
+  text-decoration: none; /* Fix Preflight */
+  border-bottom: 1px solid rgba(136,222,204,0.08); /* [ASSUMED] */
+  transition: color 0.2s, background 0.2s;
+  line-height: 1;
+}
+.pg-mobile-nav__link:last-child { border-bottom: none; }
+@media (hover: hover) {
+  .pg-mobile-nav__link:hover { color: var(--pg-teal); background: rgba(136,222,204,0.05); }
+}
+.pg-mobile-nav__link:focus-visible {
+  outline: 2px solid var(--pg-teal);
+  outline-offset: -2px;
+}
+
+/* Mobile Partner (below links) [SPEC: Partner sits under the links] */
+.pg-mobile-partner {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* [ASSUMED] */
+  padding: 14px 20px; /* [ASSUMED] */
+  text-decoration: none; /* Fix Preflight */
+  background: rgba(238,241,234,0.06); /* [ASSUMED: cream tint] */
+}
+
+/* ── Entrance hidden states ──────────────────────────────────────────────── */
+/* Applied by useHeroEntrance hook before animation starts,
+   removed when animation completes so no inline style remains [SPEC] */
+.pg-hidden { opacity: 0; }
+.pg-title-hidden { transform: translateY(115%); } /* [SPEC: translateY(115%) inside clip] */
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+/* ≤649.98px or ≤500px height [SPEC] */
+@media (max-width: 649.98px), (max-height: 500px) {
+  .pg-stage {
+    --u: clamp(0.94px, 100vw / 390, 1.2px); /* [SPEC] */
+  }
+}
+
+/* Mobile only ≤649.98px [SPEC: hide nav pill, show menu button] */
+@media (max-width: 649.98px) {
+  .pg-nav-pill { display: none !important; }
+  .pg-menu-btn { display: flex !important; }
+  .pg-mobile-nav { display: block; }
+
+  /* [SPEC: gutter clamp(18px, 5.6vw, 32px)] */
+  .pg-header {
+    padding: calc(var(--u) * 16 + env(safe-area-inset-top, 0px)) /* [SPEC: safe-area] */
+             clamp(18px, 5.6vw, 32px)
+             calc(var(--u) * 16)
+             clamp(18px, 5.6vw, 32px);
+  }
+
+  .pg-hero-content {
+    left: clamp(18px, 5.6vw, 32px);
+    right: clamp(18px, 5.6vw, 32px);
+    max-width: none;
+    bottom: calc(var(--u) * 200); /* [SPEC: Hero sits above the scroll cue] */
+    gap: calc(var(--u) * 14);
+  }
+  .pg-scroll-cue {
+    right: clamp(18px, 5.6vw, 32px);
+    bottom: calc(var(--u) * 24);
+  }
+
+  /* [SPEC: title size formula; longest line "A Healthier Harvest"; divisor 8.7] */
+  .pg-stage {
+    --pg-title-size: min(clamp(28px, 9.5vw, 52px), calc((100vw - 2 * clamp(18px, 5.6vw, 32px)) / 8.7));
+  }
+
+  /* [SPEC: radial shade removed] */
+  .pg-shade--radial { display: none; }
+
+  /* [SPEC: video 63% 50%] */
+  .pg-video { object-position: 63% 50%; }
+
+  /* [SPEC: actions wrap] */
+  .pg-actions { flex-wrap: wrap; gap: calc(var(--u) * 16); }
+
+  /* [SPEC: scroll cue stays bottom-right] */
+  .pg-scroll-cue {
+    right: clamp(18px, 5.6vw, 32px);
+    bottom: calc(var(--u) * 32);
+  }
+
+  /* [SPEC: touch padding on text link and cue] */
+  .pg-text-link { padding: 12px 0; }
+
+  /* [SPEC: headline tracking switches to em values] */
+  .pg-title__line:nth-child(1) .pg-title__line-inner { letter-spacing: -0.03em; }
+  .pg-title__line:nth-child(2) .pg-title__line-inner { letter-spacing: -0.01em; }
+  .pg-title__line:nth-child(3) .pg-title__line-inner { letter-spacing: -0.05em; }
+}
+
+/* Short landscape [SPEC: max-height 500px and min-aspect-ratio 1/1] */
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+  .pg-stage {
+    --u: clamp(0.82px, 100dvh / 415, 0.94px); /* [SPEC] */
+    --pg-title-size: clamp(22px, 8.5dvh, 32px); /* [SPEC] */
+  }
+  .pg-header {
+    padding: calc(var(--u) * 12) calc(var(--u) * 32);
+  }
+  .pg-hero-content {
+    bottom: calc(var(--u) * 24);
+    gap: calc(var(--u) * 10);
+  }
+  .pg-video { object-position: 50% 30%; } /* [SPEC] */
+  .pg-actions { flex-wrap: nowrap; gap: calc(var(--u) * 16); } /* [SPEC: actions do not wrap] */
+}
+
+/* Two-column mobile menu in short landscape [SPEC] */
+@media (max-height: 500px) and (min-aspect-ratio: 1/1) and (max-width: 649.98px) {
+  .pg-mobile-nav {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Tablets 650–1100px wide, ≥501px tall [SPEC: pin --u to 0.94px] */
+@media (min-width: 650px) and (max-width: 1100px) and (min-height: 501px) {
+  .pg-stage { --u: 0.94px; } /* [SPEC] */
+}
+
+/* Portrait ≥650px wide, max-aspect-ratio 4/5, min-height 501px [SPEC] */
+@media (min-width: 650px) and (max-aspect-ratio: 4/5) and (min-height: 501px) {
+  .pg-stage { --u: 0.94px; } /* [SPEC: pin] */
+  /* [SPEC: scale hero and cue by 1.1] */
+  .pg-hero-content { transform: scale(1.1); transform-origin: bottom left; }
+  .pg-scroll-cue   { transform: scale(1.1); transform-origin: bottom right; }
+  /* [SPEC: video 58% 50%] */
+  .pg-video { object-position: 58% 50%; }
+}
+
+/* [SPEC: prefers-reduced-motion: no transitions or animations] */
+@media (prefers-reduced-motion: reduce) {
+  .pg-stage * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  /* Show finished state immediately */
+  .pg-hidden { opacity: 1; }
+  .pg-title-hidden { transform: none; }
+  .pg-sound-wave { animation: none !important; }
+}
+
+/* ── Non-hero shared components (for inner pages, uses Tailwind tokens) ─── */
+/* These keep the same namespacing but rely on Tailwind utility values */
+.pg-inner-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(136,222,204,0.08);
+  background: rgba(3,8,11,0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-sizing: border-box;
+}
+
+/* Non-hero nav link (inner pages) */
+.pg-inner-nav-link {
+  font-family: var(--pg-font-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(245,250,246,0.65);
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 9999px;
+  transition: color 0.2s, background 0.2s;
+  outline: none;
+}
+@media (hover: hover) {
+  .pg-inner-nav-link:hover { color: #F5FAF6; background: rgba(136,222,204,0.08); }
+}
+.pg-inner-nav-link:focus-visible { outline: 2px solid #88DECC; outline-offset: 2px; }
+.pg-inner-nav-link[aria-current="page"] { color: #88DECC; }
+
+/* Non-hero CTA button (reusable) */
+.pg-btn-primary {
+  font-family: var(--pg-font-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #122B2A;
+  background: #88DECC;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.55rem 1.4rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  outline: none;
+  line-height: 1;
+}
+@media (hover: hover) {
+  .pg-btn-primary:hover { background: #a5e8db; transform: scale(1.03); }
+}
+.pg-btn-primary:focus-visible { outline: 2px solid #88DECC; outline-offset: 3px; }
+
+/* Glass card (shared utility, also available via Tailwind @utility) */
+.pg-glass {
+  background: rgba(3,8,11,0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(136,222,204,0.18);
+  border-radius: 1rem;
+}

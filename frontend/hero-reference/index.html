@@ -1,0 +1,1212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#03080B" />
+  <title>PlantGuard AI — Crop Leaf Disease Detection</title>
+  <style>
+    /* =====================================================================
+       HERO-REFERENCE/index.html
+       Stage A standalone reference for PlantGuard AI hero.
+       All [SPEC] values copied character-for-character from HERO_SPEC.
+       [OVERRIDE] values come from section 2 content registry.
+       [ASSUMED] values are listed in the ASSUMED VALUES block below.
+       ===================================================================== */
+
+    /* ── Font faces [SPEC: font names, weights, files, stacks, font-display] ── */
+    @font-face {
+      font-family: "RV Display";
+      font-weight: 300;
+      font-display: block;
+      src: url("assets/fonts/rv-display.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "RV Brand";
+      font-weight: 600;
+      font-display: block;
+      src: url("assets/fonts/rv-brand.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: "RV Text";
+      font-weight: 400;
+      font-display: block;
+      src: url("assets/fonts/rv-text.woff2") format("woff2");
+    }
+
+    /* ── Custom properties [SPEC] ─────────────────────────────────────────── */
+    :root {
+      /* Unit [SPEC] */
+      --u: max(0.62px, min(100vw / 1280, 100dvh / 960));
+
+      /* Colors [SPEC] */
+      --c-bg:      #03080B;
+      --c-ink:     #F5FAF6;
+      --c-ink-2:   #ECF1EF;
+      --c-teal:    #88DECC;
+      --c-icon-teal: #7EC4B5;
+      --c-chevron: #7CCBBA;
+      --c-moth:    #315352;
+      --c-cream:   #EEF1EA;
+      --c-pine:    #122B2A;
+      --c-logo-disc: #030909;
+
+      /* Font stacks [SPEC: families exactly as given] */
+      --font-display: "RV Display", "Poppins", "Helvetica Neue", Arial, sans-serif;
+      --font-brand:   "RV Brand", "Urbanist", "Helvetica Neue", Arial, sans-serif;
+      --font-text:    "RV Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+      /* ===== ASSUMED VALUES ===== */
+      /* Headline size: derived from 1280×960 reference. Longest line "A Healthier Harvest"
+         (19 chars) spans ~42% of 1280px at 68px. clamp based on --u [ASSUMED] */
+      --title-size: clamp(2.2rem, calc(var(--u) * 68), 4.5rem);
+      --title-lh: 0.92;
+
+      /* Per-line letter-spacing [ASSUMED: derived from proportions] */
+      --title-ls-1: -0.03em;   /* "A Healthier Harvest" */
+      --title-ls-2: -0.01em;   /* "Starts with" */
+      --title-ls-3: -0.05em;   /* "a Leaf" */
+
+      /* Desktop nav pill geometry [SPEC] */
+      --nav-pill-w: calc(var(--u) * 442);
+      --nav-pill-h: calc(var(--u) * 47);
+      --pill-r: 9999px;
+
+      /* Logo pill geometry [SPEC] */
+      --logo-pill-w: calc(var(--u) * 104);
+      --logo-pill-h: calc(var(--u) * 46);
+      --logo-disc-sz: calc(var(--u) * 46);
+
+      /* Sound button [SPEC: 48px] */
+      --sound-btn-sz: calc(var(--u) * 48);
+
+      /* Easing [ASSUMED: standard names matching Web Animations usage] */
+      --ease-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-grow:   cubic-bezier(0.45, 0, 0.2, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ── Reset ────────────────────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html { font-size: 16px; color-scheme: dark; }
+
+    body {
+      background: var(--c-bg);
+      color: var(--c-ink);
+      font-family: var(--font-text);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden; /* stage is 100dvh, no page scroll */
+    }
+
+    /* ── Stage [SPEC: exactly 100dvh, overflow hidden] ───────────────────── */
+    .pg-stage {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--c-bg);
+    }
+
+    /* ── Video [SPEC: object-fit cover, pointer-events none, position 50% 40%] */
+    .pg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 40%; /* [SPEC] */
+      pointer-events: none;
+      z-index: 0;
+    }
+    @media (min-aspect-ratio: 16/9) {
+      /* [SPEC: at min-aspect-ratio 16/9, object-position 50% 24%] */
+      .pg-video { object-position: 50% 24%; }
+    }
+
+    /* ── Shade layers [SPEC] ──────────────────────────────────────────────── */
+    .pg-shade {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Horizontal gradient [SPEC: alpha .683,.595,.458,.221,.039,.054 at 0,20,40,60,80,100%] */
+    .pg-shade--horiz {
+      background: linear-gradient(
+        to right,
+        rgba(3,8,11, 0.683) 0%,
+        rgba(3,8,11, 0.595) 20%,
+        rgba(3,8,11, 0.458) 40%,
+        rgba(3,8,11, 0.221) 60%,
+        rgba(3,8,11, 0.039) 80%,
+        rgba(3,8,11, 0.054) 100%
+      );
+    }
+    /* Vertical gradient [SPEC: alpha .060,.023,.152,.300,.394,.632 at same stops] */
+    .pg-shade--vert {
+      background: linear-gradient(
+        to bottom,
+        rgba(3,8,11, 0.060) 0%,
+        rgba(3,8,11, 0.023) 20%,
+        rgba(3,8,11, 0.152) 40%,
+        rgba(3,8,11, 0.300) 60%,
+        rgba(3,8,11, 0.394) 80%,
+        rgba(3,8,11, 0.632) 100%
+      );
+    }
+    /* Bottom-left radial [SPEC: 93.8% by 41.3% at 0% 100%, shade from 1 to 0] */
+    .pg-shade--radial {
+      background: radial-gradient(
+        ellipse 93.8% 41.3% at 0% 100%,
+        rgba(3,8,11, 1.0) 0%,
+        rgba(3,8,11, 0.0) 100%
+      );
+    }
+
+    /* ── Header [SPEC: logo pill top-left, nav pill top-center-right, sound far-right] */
+    .pg-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      /* [ASSUMED: padding from 1280×960 reference proportions] */
+      padding: calc(var(--u) * 26) calc(var(--u) * 48);
+      gap: calc(var(--u) * 16);
+    }
+
+    /* ── Logo pill [SPEC: 104×46 glass, rgba(150,220,130,.035), blur 12] ── */
+    .pg-logo-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: var(--logo-pill-w);
+      height: var(--logo-pill-h);
+      background: rgba(150, 220, 130, 0.035); /* [SPEC] */
+      backdrop-filter: blur(12px); /* [SPEC] */
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: var(--pill-r);
+      text-decoration: none;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(136, 222, 204, 0.12); /* [ASSUMED: subtle border] */
+      padding-right: calc(var(--u) * 6);
+    }
+
+    /* Disc inside logo pill [SPEC: 46px disc, #030909] */
+    .pg-logo-disc {
+      width: var(--logo-disc-sz);
+      height: var(--logo-disc-sz);
+      background: var(--c-logo-disc); /* [SPEC] */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Tree SVG in disc [SPEC: viewBox 0 0 46 46, stroke #7CC6B5, width 1.6, round caps, 7 paths] */
+    .pg-logo-tree {
+      width: calc(var(--u) * 46);
+      height: calc(var(--u) * 46);
+    }
+
+    /* Moth next to tree [SPEC: viewBox 0 0 39 30, fill #315352, mirrored path] */
+    .pg-logo-moth {
+      width: calc(var(--u) * 39);
+      height: calc(var(--u) * 30);
+      flex-shrink: 0;
+    }
+
+    /* Brand text inside logo pill [OVERRIDE: "PlantGuard AI"] */
+    .pg-brand {
+      font-family: var(--font-brand);
+      font-size: calc(var(--u) * 14); /* [ASSUMED] */
+      font-weight: 600;
+      color: var(--c-teal);
+      letter-spacing: -0.01em; /* [ASSUMED] */
+      line-height: 1;
+      padding: 0 calc(var(--u) * 10); /* [ASSUMED] */
+      white-space: nowrap;
+    }
+
+    /* ── Nav pill [SPEC: black 442×47] ───────────────────────────────────── */
+    .pg-nav-pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: var(--nav-pill-w);
+      height: var(--nav-pill-h);
+      background: #000; /* [SPEC: black] */
+      border-radius: var(--pill-r);
+      flex-shrink: 0;
+      overflow: visible;
+      gap: 0;
+      padding: 0 calc(var(--u) * 4);
+    }
+
+    /* Nav links [SPEC: absolutely placed] */
+    .pg-nav-links {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      /* [ASSUMED: evenly spaced since no exact x positions given in spec] */
+    }
+    .pg-nav-link {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 13); /* [ASSUMED] */
+      font-weight: 400;
+      color: var(--c-ink-2);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 0 calc(var(--u) * 9); /* [ASSUMED] */
+      display: flex;
+      align-items: center;
+      gap: calc(var(--u) * 4);
+      height: 100%;
+      transition: color 0.2s;
+    }
+    @media (hover: hover) {
+      .pg-nav-link:hover { color: var(--c-teal); } /* [SPEC: hover text #88DECC] */
+    }
+    .pg-nav-link:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; } /* [SPEC: 2px teal focus-visible] */
+    .pg-nav-link[aria-current="page"] { color: var(--c-ink); }
+
+    /* Chevron for current route [SPEC: M.7.7 5.5 5.3 10.3.7] */
+    .pg-nav-chevron {
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    /* Cream "Analyze Leaf" pill [OVERRIDE label; SPEC: cream pill, dark disc, white chevron] */
+    .pg-partner-pill {
+      display: flex;
+      align-items: center;
+      height: calc(var(--u) * 35); /* [ASSUMED] */
+      background: var(--c-cream); /* [SPEC] */
+      border-radius: var(--pill-r);
+      margin-left: calc(var(--u) * 4); /* [ASSUMED] */
+      text-decoration: none;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+    @media (hover: hover) {
+      .pg-partner-pill:hover { background: var(--c-teal); } /* [ASSUMED: consistent with spec hover #88DECC] */
+    }
+    .pg-partner-pill:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; }
+    .pg-partner-disc {
+      width: calc(var(--u) * 35); /* [ASSUMED: disc matches pill height] */
+      height: calc(var(--u) * 35);
+      background: var(--c-pine); /* [SPEC: pine discs] */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    @media (hover: hover) {
+      .pg-partner-pill:hover .pg-partner-disc { background: #26504d; } /* [SPEC: hover discs #26504d] */
+    }
+    .pg-partner-text {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 13); /* [ASSUMED] */
+      font-weight: 600;
+      color: var(--c-pine);
+      padding: 0 calc(var(--u) * 12) 0 calc(var(--u) * 8); /* [ASSUMED] */
+      white-space: nowrap;
+    }
+
+    /* ── Sound button [SPEC: 48px blurred dark circle] ───────────────────── */
+    .pg-sound-btn {
+      position: relative;
+      width: var(--sound-btn-sz);
+      height: var(--sound-btn-sz);
+      border-radius: 50%;
+      background: rgba(3,8,11,0.7); /* [SPEC: blurred dark] */
+      backdrop-filter: blur(12px); /* [SPEC: blurred] */
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(136,222,204,0.15); /* [ASSUMED] */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--c-ink-2);
+      flex-shrink: 0;
+      transition: color 0.2s;
+      padding: 0;
+    }
+    @media (hover: hover) {
+      .pg-sound-btn:hover { color: var(--c-teal); }
+    }
+    .pg-sound-btn:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; }
+
+    /* Sound waves [SPEC: two waves drop to opacity .25 when aria-pressed=false] */
+    .pg-sound-waves {
+      position: absolute;
+      right: calc(var(--u) * -20); /* [ASSUMED] */
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      pointer-events: none;
+    }
+    .pg-sound-wave {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--c-teal);
+      animation: pgSoundWave 0.9s ease-in-out infinite alternate;
+      transition: opacity 0.3s;
+    }
+    .pg-sound-wave:nth-child(1) { height: 8px; animation-delay: 0s; }
+    .pg-sound-wave:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+    /* [SPEC: two waves. Showing 2 as per spec's speaker paths having 2 wave paths] */
+    /* [SPEC: opacity .25 when aria-pressed=false] */
+    .pg-sound-btn[aria-pressed="false"] .pg-sound-wave { opacity: 0.25; }
+    .pg-sound-btn[aria-pressed="true"]  .pg-sound-wave { opacity: 0.9; }
+    @keyframes pgSoundWave {
+      from { transform: scaleY(0.4); }
+      to   { transform: scaleY(1.0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pg-sound-wave { animation: none; }
+    }
+
+    /* Mobile menu button [SPEC: hidden at desktop, 48px] */
+    .pg-menu-btn {
+      display: none;
+      width: var(--sound-btn-sz);
+      height: var(--sound-btn-sz);
+      border-radius: 50%; /* [ASSUMED: circular matching sound button] */
+      background: #000; /* [SPEC: black menu button] */
+      border: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--c-ink);
+      flex-shrink: 0;
+    }
+    .pg-menu-btn:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; }
+
+    /* ── Hero content (bottom-left) ──────────────────────────────────────── */
+    .pg-hero-content {
+      position: absolute;
+      bottom: calc(var(--u) * 120); /* [ASSUMED: above scroll cue] */
+      left: calc(var(--u) * 48); /* [ASSUMED: same as header left padding] */
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: calc(var(--u) * 28); /* [ASSUMED] */
+      max-width: calc(var(--u) * 820); /* [ASSUMED: ~64% of 1280] */
+    }
+
+    /* Headline [SPEC: three lines, light weight, nowrap, per-line clip mask] */
+    .pg-title {
+      font-family: var(--font-display);
+      font-size: var(--title-size);
+      font-weight: 300; /* [SPEC: light weight] */
+      line-height: var(--title-lh);
+      color: var(--c-ink);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .pg-title__line {
+      display: block;
+      white-space: nowrap; /* [SPEC: nowrap] */
+      overflow: hidden; /* clip mask per line */
+    }
+    .pg-title__line--inner {
+      display: block;
+      /* Hidden state for animation [SPEC: translateY(115%) inside clip mask] */
+    }
+    /* Per-line letter-spacing [ASSUMED] */
+    .pg-title__line:nth-child(1) .pg-title__line--inner { letter-spacing: var(--title-ls-1); }
+    .pg-title__line:nth-child(2) .pg-title__line--inner { letter-spacing: var(--title-ls-2); }
+    .pg-title__line:nth-child(3) .pg-title__line--inner { letter-spacing: var(--title-ls-3); }
+
+    /* Lede [SPEC: two lines] */
+    .pg-lede {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 18); /* [ASSUMED] */
+      font-weight: 400;
+      color: var(--c-ink-2); /* [ASSUMED: ink-2 for lede] */
+      line-height: 1.6; /* [ASSUMED] */
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--u) * 4); /* [ASSUMED] */
+    }
+    .pg-lede__line { display: block; }
+
+    /* CTA cluster [SPEC: pill + text link] */
+    .pg-actions {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--u) * 24); /* [ASSUMED] */
+    }
+
+    /* CTA pill [SPEC: dark disc + white chevron, cream background] */
+    .pg-cta-pill {
+      display: flex;
+      align-items: center;
+      background: var(--c-cream); /* [SPEC] */
+      border-radius: var(--pill-r);
+      text-decoration: none;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+    @media (hover: hover) {
+      .pg-cta-pill:hover { background: var(--c-teal); } /* [ASSUMED: per spec hover #88DECC] */
+      .pg-cta-pill:hover .pg-cta-disc { background: #26504d; } /* [SPEC: hover discs #26504d] */
+    }
+    .pg-cta-pill:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 3px; }
+    .pg-cta-disc {
+      width: calc(var(--u) * 46); /* [ASSUMED: ~CTA pill height] */
+      height: calc(var(--u) * 46);
+      background: var(--c-pine); /* [SPEC: pine discs] */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .pg-cta-text {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 15); /* [ASSUMED] */
+      font-weight: 600;
+      color: var(--c-pine);
+      padding: 0 calc(var(--u) * 20) 0 calc(var(--u) * 12); /* [ASSUMED] */
+      white-space: nowrap;
+    }
+
+    /* Text link [SPEC: "Browse Diseases", hover #88DECC] */
+    .pg-text-link {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 15); /* [ASSUMED] */
+      font-weight: 400;
+      color: var(--c-ink-2);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: calc(var(--u) * 6); /* [ASSUMED] */
+      transition: color 0.2s;
+      /* [SPEC: touch padding on text link at mobile] */
+      padding: calc(var(--u) * 8) 0; /* [ASSUMED] */
+    }
+    @media (hover: hover) {
+      .pg-text-link:hover { color: var(--c-teal); } /* [SPEC] */
+    }
+    .pg-text-link:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; }
+
+    /* Scroll cue [SPEC: bottom-right, teal chevron, hover #88DECC] */
+    .pg-scroll-cue {
+      position: absolute;
+      bottom: calc(var(--u) * 48); /* [ASSUMED] */
+      right: calc(var(--u) * 48); /* [SPEC: bottom-right] */
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: calc(var(--u) * 8); /* [ASSUMED] */
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--c-ink-2);
+      /* [SPEC: touch padding on cue at mobile] */
+      padding: calc(var(--u) * 8); /* [ASSUMED] */
+      transition: color 0.2s;
+    }
+    @media (hover: hover) {
+      .pg-scroll-cue:hover { color: var(--c-teal); } /* [SPEC] */
+    }
+    .pg-scroll-cue:focus-visible { outline: 2px solid var(--c-teal); outline-offset: 2px; }
+    .pg-scroll-cue__label {
+      font-family: var(--font-text);
+      font-size: calc(var(--u) * 11); /* [ASSUMED] */
+      font-weight: 400;
+      letter-spacing: 0.1em; /* [ASSUMED] */
+      text-transform: uppercase;
+      writing-mode: vertical-rl; /* [ASSUMED: vertical for bottom-right placement] */
+      transform: rotate(180deg);
+    }
+    .pg-scroll-cue__chevron {
+      color: var(--c-teal); /* [SPEC: teal chevron] */
+    }
+
+    /* ── Mobile nav panel [SPEC: black rounded, hidden until .is-open] ───── */
+    .pg-mobile-nav {
+      display: none; /* hidden by default */
+      position: absolute;
+      top: calc(var(--u) * 90); /* [ASSUMED: below header] */
+      left: calc(var(--u) * 18);
+      right: calc(var(--u) * 18);
+      z-index: 40;
+      background: #000; /* [SPEC: black] */
+      border-radius: calc(var(--u) * 16); /* [ASSUMED] */
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+    }
+    .pg-mobile-nav.is-open {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    /* [SPEC: links stack at 48px tall, 17px type] */
+    .pg-mobile-nav__link {
+      display: flex;
+      align-items: center;
+      height: calc(var(--u) * 48); /* [SPEC] */
+      padding: 0 calc(var(--u) * 20); /* [ASSUMED] */
+      font-family: var(--font-text);
+      font-size: 17px; /* [SPEC: 17px type] */
+      font-weight: 400;
+      color: var(--c-ink-2);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(136, 222, 204, 0.08); /* [ASSUMED] */
+      transition: color 0.2s, background 0.2s;
+    }
+    .pg-mobile-nav__link:last-child { border-bottom: none; }
+    @media (hover: hover) {
+      .pg-mobile-nav__link:hover { color: var(--c-teal); background: rgba(136,222,204,0.05); }
+    }
+    .pg-mobile-nav__link:focus-visible { outline: 2px solid var(--c-teal); outline-offset: -2px; }
+    /* Partner under links in mobile [SPEC: Partner sits under the links] */
+    .pg-mobile-nav__partner {
+      display: flex;
+      align-items: center;
+      gap: calc(var(--u) * 10);
+      padding: calc(var(--u) * 14) calc(var(--u) * 20); /* [ASSUMED] */
+      background: rgba(238,241,234,0.06); /* [ASSUMED: cream tint] */
+      text-decoration: none;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+
+    /* ≤649.98px or ≤500px height [SPEC] */
+    @media (max-width: 649.98px), (max-height: 500px) {
+      :root {
+        /* [SPEC: clamp(0.94px, 100vw/390, 1.2px)] */
+        --u: clamp(0.94px, 100vw / 390, 1.2px);
+      }
+    }
+
+    /* Mobile only (≤649.98px) [SPEC: hide nav pill, show menu button] */
+    @media (max-width: 649.98px) {
+      .pg-nav-pill { display: none !important; }
+      .pg-menu-btn { display: flex !important; }
+      .pg-mobile-nav { display: block; }
+
+      /* [SPEC: gutter clamp(18px, 5.6vw, 32px)] */
+      .pg-hero-content {
+        left: clamp(18px, 5.6vw, 32px);
+        right: clamp(18px, 5.6vw, 32px);
+        max-width: none;
+        bottom: calc(var(--u) * 200); /* [SPEC: Hero sits above the scroll cue] */
+        gap: calc(var(--u) * 14);
+      }
+      /* [SPEC: softer left shade, stronger bottom shade, radial removed] */
+      .pg-shade--radial { display: none; }
+      /* [SPEC: video 63% 50%] */
+      .pg-video { object-position: 63% 50%; }
+      /* [SPEC: actions wrap] */
+      .pg-actions { flex-wrap: wrap; gap: calc(var(--u) * 12); }
+      /* [SPEC: scroll cue stays bottom-right] */
+      .pg-scroll-cue { right: clamp(18px, 5.6vw, 32px); bottom: calc(var(--u) * 24); }
+      /* [SPEC: touch padding on text link and cue] */
+      .pg-text-link { padding: 12px 0; }
+      /* Honor safe-area insets [SPEC] */
+      .pg-header {
+        padding: calc(var(--u) * 16 + env(safe-area-inset-top, 0px))
+                 clamp(18px, 5.6vw, 32px)
+                 calc(var(--u) * 16)
+                 clamp(18px, 5.6vw, 32px);
+      }
+      /* [SPEC: title size formula — longest line "A Healthier Harvest" (19 chars), divisor 8.7] */
+      :root {
+        --title-size: min(clamp(28px, 9.5vw, 52px), calc((100vw - 2 * clamp(18px, 5.6vw, 32px)) / 8.7));
+      }
+      /* [SPEC: headline tracking switches to em values] */
+      .pg-title__line:nth-child(1) .pg-title__line--inner { letter-spacing: -0.03em; }
+      .pg-title__line:nth-child(2) .pg-title__line--inner { letter-spacing: -0.01em; }
+      .pg-title__line:nth-child(3) .pg-title__line--inner { letter-spacing: -0.05em; }
+    }
+
+    /* Short landscape [SPEC: max-height 500px and min-aspect-ratio 1/1] */
+    @media (max-height: 500px) and (min-aspect-ratio: 1/1) {
+      :root {
+        /* [SPEC: clamp(0.82px, 100dvh/415, 0.94px)] */
+        --u: clamp(0.82px, 100dvh / 415, 0.94px);
+        /* [SPEC: title clamp(28px, 10dvh, 44px)] */
+        --title-size: clamp(22px, 8.5dvh, 32px);
+      }
+      .pg-header {
+        padding: calc(var(--u) * 12) calc(var(--u) * 32);
+      }
+      .pg-hero-content {
+        bottom: calc(var(--u) * 24);
+        gap: calc(var(--u) * 10);
+      }
+      /* [SPEC: video 50% 30%] */
+      .pg-video { object-position: 50% 30%; }
+      /* [SPEC: actions do not wrap] */
+      .pg-actions { flex-wrap: nowrap; gap: calc(var(--u) * 16); }
+    }
+
+    /* Two-column menu in short landscape below 650px [SPEC] */
+    @media (max-height: 500px) and (min-aspect-ratio: 1/1) and (max-width: 649.98px) {
+      .pg-mobile-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Tablets 650–1100px wide, ≥501px tall [SPEC: pin --u to 0.94px] */
+    @media (min-width: 650px) and (max-width: 1100px) and (min-height: 501px) {
+      :root { --u: 0.94px; } /* [SPEC] */
+    }
+
+    /* Portrait ≥650px wide, max-aspect-ratio 4/5, min-height 501px [SPEC] */
+    @media (min-width: 650px) and (max-aspect-ratio: 4/5) and (min-height: 501px) {
+      :root { --u: 0.94px; } /* [SPEC: pin] */
+      /* [SPEC: scale hero and cue by 1.1] */
+      .pg-hero-content { transform: scale(1.1); transform-origin: bottom left; }
+      .pg-scroll-cue   { transform: scale(1.1); transform-origin: bottom right; }
+      /* [SPEC: video 58% 50%] */
+      .pg-video { object-position: 58% 50%; }
+    }
+
+    /* [SPEC: prefers-reduced-motion: no transitions or animations] */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    /* ── Entrance hidden states (applied before JS runs, removed by animation) */
+    .pg-entrance-hidden { opacity: 0; }
+    /* Title lines hidden differently — translateY inside clip overflow */
+    .pg-title__line--inner.pg-entrance-hidden { transform: translateY(115%); opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="pg-stage" id="pg-stage" aria-label="PlantGuard AI hero">
+
+  <!-- Video [SPEC: remote URL, autoplay muted loop playsinline, object-fit cover, pointer-events none] -->
+  <video
+    class="pg-video"
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261005_182346_a590ff3b-72e5-41ce-8f69-a8c823eaecaa.mp4"
+    autoplay muted loop playsinline
+    aria-hidden="true"
+    tabindex="-1"
+    preload="auto"
+    id="pg-video"
+  ></video>
+
+  <!-- Shade layers [SPEC: three overlays] -->
+  <div class="pg-shade pg-shade--horiz" aria-hidden="true"></div>
+  <div class="pg-shade pg-shade--vert"  aria-hidden="true"></div>
+  <div class="pg-shade pg-shade--radial" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="pg-header" role="banner" id="pg-header">
+
+    <!-- Logo pill [SPEC: 104×46 glass, tree + moth, OVERRIDE: links to "/", aria-label "PlantGuard AI home"] -->
+    <a href="/" class="pg-logo-pill pg-entrance-hidden" aria-label="PlantGuard AI home" id="pg-logo">
+      <div class="pg-logo-disc">
+        <!-- Tree SVG [SPEC: viewBox 0 0 46 46, stroke #7CC6B5, width 1.6, round caps, 7 paths] -->
+        <svg class="pg-logo-tree" viewBox="0 0 46 46" fill="none" aria-hidden="true">
+          <g stroke="#7CC6B5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M24.2 37V24"/>
+            <path d="M19.8 39.3c1.2-1.9 2.8-2.7 4.4-2.7s3.2.8 4.4 2.7"/>
+            <path d="M23.8 30.2c-2.8-.6-5.5-2.6-7.2-5-2-1.8-5.2-2-7-4.2-1.4-1.8-1.4-4.2 0-6 2-3 5.8-5.2 8.8-6.2 1.4-.5 2.8-1 4.2-1.3"/>
+            <path d="M14.8 23V13.2c0-1.4.8-2.6 2.4-3.4"/>
+            <path d="M24 24.2c-1.8-1.8-3.2-3.8-3.7-6.4-.5-2.6-.6-5.2-.3-7.2"/>
+            <path d="M24.3 23.2c1.5-3 3.5-6.4 4.3-10.2.4-2.6 1.2-4.1 2.8-4.3H35"/>
+            <path d="M24.6 25.7c3-.7 5.8-2.1 7.4-4.5 1.2-1.8 1.4-3.8 2.8-5.2 1.4-1.4 3.2-2.1 5.2-2.4"/>
+          </g>
+        </svg>
+      </div>
+      <!-- Moth [SPEC: viewBox 0 0 39 30, fill #315352, mirrored path] -->
+      <svg class="pg-logo-moth" viewBox="0 0 39 30" fill="none" aria-hidden="true">
+        <!-- Right wing [SPEC path verbatim] -->
+        <path d="M19.5 12.4C17.5 9.5 14 5 10.8 3 9.6 2.4 8 2.2 6 2.3 4.2 2.4 3.1 3 3 4.8L3.1 9.8C3.2 12.4 5 15 8.3 17.3 6.6 19.5 5.6 21.8 5.4 24.2 5.2 26.2 5.8 27.6 7.3 28 8.8 28.3 10.2 27.3 11.4 25.8 14.2 22.6 17.2 19.8 19.5 17.1Z" fill="#315352"/>
+        <!-- Left wing [SPEC: same path mirrored with matrix(-1 0 0 1 39 0)] -->
+        <path d="M19.5 12.4C17.5 9.5 14 5 10.8 3 9.6 2.4 8 2.2 6 2.3 4.2 2.4 3.1 3 3 4.8L3.1 9.8C3.2 12.4 5 15 8.3 17.3 6.6 19.5 5.6 21.8 5.4 24.2 5.2 26.2 5.8 27.6 7.3 28 8.8 28.3 10.2 27.3 11.4 25.8 14.2 22.6 17.2 19.8 19.5 17.1Z" fill="#315352" transform="matrix(-1 0 0 1 39 0)"/>
+      </svg>
+    </a>
+
+    <!-- Nav pill [SPEC: 442×47 black, OVERRIDE: PlantGuard nav links] -->
+    <nav class="pg-nav-pill pg-entrance-hidden" aria-label="Primary navigation" id="pg-nav" role="navigation">
+      <div class="pg-nav-links">
+        <a href="/" class="pg-nav-link" aria-current="page">
+          Home
+          <!-- Chevron for current [SPEC: M.7.7 5.5 5.3 10.3.7] -->
+          <svg class="pg-nav-chevron" width="11" height="6" viewBox="0 0 11 6" fill="none" aria-hidden="true">
+            <polyline points=".7,.7 5.5,5.3 10.3,.7" stroke="#7CCBBA" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </a>
+        <a href="/analyze" class="pg-nav-link">Analyze</a>
+        <a href="/diseases" class="pg-nav-link">Diseases</a>
+        <a href="/#how-it-works" class="pg-nav-link">How It Works</a>
+        <a href="/#safety" class="pg-nav-link">Safety</a>
+      </div>
+      <!-- Cream pill [OVERRIDE: "Analyze Leaf" → /analyze; SPEC: dark disc, white chevron/arrow] -->
+      <a href="/analyze" class="pg-partner-pill" aria-label="Analyze a leaf">
+        <div class="pg-partner-disc">
+          <!-- Partner arrow [SPEC: M.5.5 3.5 3.5.5 6.5] -->
+          <svg width="7" height="7" viewBox="0 0 7 7" fill="none" aria-hidden="true">
+            <polyline points=".5,.5 3.5,3.5 .5,6.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="pg-partner-text">Analyze Leaf</span>
+      </a>
+    </nav>
+
+    <!-- Right cluster: menu button (mobile) + sound button -->
+    <div style="display:flex;align-items:center;gap:calc(var(--u)*10);flex-shrink:0;">
+      <!-- Mobile menu button [SPEC: 3-bar → X, aria-expanded toggle] -->
+      <button
+        class="pg-menu-btn pg-entrance-hidden"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="pg-mobile-nav"
+        id="pg-menu-btn"
+        type="button"
+      >
+        <!-- Bars SVG [SPEC: M1 1h16, M1 6h16, M1 11h16] -->
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none" aria-hidden="true" id="pg-menu-bars">
+          <line x1="1" y1="1" x2="17" y2="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="1" y1="6" x2="17" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="1" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <!-- X icon (hidden until expanded) -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" id="pg-menu-x" style="display:none">
+          <line x1="1" y1="1" x2="17" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="17" y1="1" x2="1" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Sound button [SPEC: 48px, aria-label "Ambient nature sound" [OVERRIDE], aria-pressed toggle] -->
+      <button
+        class="pg-sound-btn pg-entrance-hidden"
+        aria-label="Ambient nature sound"
+        aria-pressed="false"
+        id="pg-sound-btn"
+        type="button"
+      >
+        <!-- Speaker [SPEC: body M14.6 19.6h3.6l5.9-4.9v18.6l-5.9-4.9h-3.6z; waves M27.6 19.6c1.9 2.8 1.9 6 0 8.8 and M31.2 16.2c3.4 4.9 3.4 10.7 0 15.6] -->
+        <!-- Scaled to fit 20×20 viewBox from spec's ~48px space -->
+        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M14.6 19.6h3.6l5.9-4.9v18.6l-5.9-4.9h-3.6z" fill="currentColor"/>
+          <path id="pg-wave-1" d="M27.6 19.6c1.9 2.8 1.9 6 0 8.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path id="pg-wave-2" d="M31.2 16.2c3.4 4.9 3.4 10.7 0 15.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <!-- Sound waves (CSS) -->
+        <span class="pg-sound-waves" aria-hidden="true">
+          <span class="pg-sound-wave"></span>
+          <span class="pg-sound-wave"></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile nav panel [SPEC: black rounded, hidden until .is-open, links 48px tall, 17px] -->
+  <nav
+    class="pg-mobile-nav"
+    id="pg-mobile-nav"
+    aria-label="Mobile navigation"
+    aria-hidden="true"
+  >
+    <a href="/" class="pg-mobile-nav__link">Home</a>
+    <a href="/analyze" class="pg-mobile-nav__link">Analyze</a>
+    <a href="/diseases" class="pg-mobile-nav__link">Diseases</a>
+    <a href="/#how-it-works" class="pg-mobile-nav__link">How It Works</a>
+    <a href="/#safety" class="pg-mobile-nav__link">Safety</a>
+    <!-- Partner under links [SPEC] -->
+    <a href="/analyze" class="pg-mobile-nav__partner">
+      <div class="pg-partner-disc" style="width:32px;height:32px;">
+        <svg width="7" height="7" viewBox="0 0 7 7" fill="none" aria-hidden="true">
+          <polyline points=".5,.5 3.5,3.5 .5,6.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <span style="font-family:var(--font-text);font-size:15px;color:var(--c-ink-2);">Analyze Leaf</span>
+    </a>
+  </nav>
+
+  <!-- Hero content (bottom-left) [SPEC: brand, headline, lede; OVERRIDE: PlantGuard content] -->
+  <main class="pg-hero-content" id="pg-hero-main">
+
+    <!-- Brand [OVERRIDE: "PlantGuard AI", SPEC: RV Brand font, teal] -->
+    <span class="pg-brand pg-entrance-hidden" id="pg-hero-brand" aria-hidden="true" style="font-size:calc(var(--u)*20);padding:0;">PlantGuard AI</span>
+
+    <!-- Headline [SPEC: 3 lines, light, nowrap, per-line clip mask; OVERRIDE: lines] -->
+    <h1 class="pg-title" aria-label="A Healthier Harvest Starts with a Leaf">
+      <span class="pg-title__line">
+        <span class="pg-title__line--inner pg-entrance-hidden" id="pg-title-1">A Healthier Harvest</span>
+      </span>
+      <span class="pg-title__line">
+        <span class="pg-title__line--inner pg-entrance-hidden" id="pg-title-2">Starts with</span>
+      </span>
+      <span class="pg-title__line">
+        <span class="pg-title__line--inner pg-entrance-hidden" id="pg-title-3">a Leaf</span>
+      </span>
+    </h1>
+
+    <!-- Lede [SPEC: 2 lines; OVERRIDE: PlantGuard lede] -->
+    <p class="pg-lede pg-entrance-hidden" id="pg-lede">
+      <span class="pg-lede__line">AI-powered diagnosis across 15 crop leaf conditions</span>
+      <span class="pg-lede__line">Upload a leaf and get a calibrated result in seconds</span>
+    </p>
+
+    <!-- Actions [SPEC: CTA pill + text link] -->
+    <div class="pg-actions pg-entrance-hidden" id="pg-actions">
+      <!-- CTA pill [SPEC: dark disc + white chevron/arrow; OVERRIDE: "Analyze a Leaf" → /analyze] -->
+      <a href="/analyze" class="pg-cta-pill" aria-label="Analyze a leaf">
+        <div class="pg-cta-disc">
+          <!-- CTA arrow [SPEC: M.6.6 4 4 .6 7.4] -->
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="none" aria-hidden="true">
+            <polyline points=".6,.6 4,4 .6,7.4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="pg-cta-text">Analyze a Leaf</span>
+      </a>
+      <!-- Text link [OVERRIDE: "Browse Diseases" → /diseases] -->
+      <a href="/diseases" class="pg-text-link">
+        Browse Diseases
+        <!-- Small chevron [SPEC: M.7.7 5.5 5.3 10.3.7] -->
+        <svg width="10" height="6" viewBox="0 0 11 6" fill="none" aria-hidden="true">
+          <polyline points=".7,.7 5.5,5.3 10.3,.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </a>
+    </div>
+  </main>
+
+  <!-- Scroll cue [SPEC: bottom-right, teal chevron; OVERRIDE: → #how-it-works] -->
+  <a href="#how-it-works" class="pg-scroll-cue pg-entrance-hidden" id="pg-scroll-cue" aria-label="Scroll to How It Works section">
+    <!-- Chevron [SPEC: M.7.7 5.5 5.3 10.3.7, teal] -->
+    <svg class="pg-scroll-cue__chevron" width="11" height="6" viewBox="0 0 11 6" fill="none" aria-hidden="true">
+      <polyline points=".7,.7 5.5,5.3 10.3,.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <span class="pg-scroll-cue__label">Scroll for Details</span>
+  </a>
+
+</div><!-- /.pg-stage -->
+
+<script>
+// =====================================================================
+// PlantGuard AI Hero — Entrance Animation + Interactions
+// All timings are [SPEC] unless tagged otherwise.
+// =====================================================================
+
+(function () {
+  'use strict';
+
+  // ── Constants [SPEC] ──────────────────────────────────────────────────────
+  var EASE_QUART  = 'cubic-bezier(0.25, 1, 0.5, 1)';  // [SPEC: quart]
+  var EASE_EXPO   = 'cubic-bezier(0.16, 1, 0.3, 1)';  // [SPEC: expo]
+  var EASE_GROW   = 'cubic-bezier(0.45, 0, 0.2, 1)';  // [SPEC: grow]
+  var FAILSAFE_MS = 3500;                               // [SPEC: 3.5s failsafe]
+
+  var video    = document.getElementById('pg-video');
+  var stage    = document.getElementById('pg-stage');
+  var logo     = document.getElementById('pg-logo');
+  var nav      = document.getElementById('pg-nav');
+  var menuBtn  = document.getElementById('pg-menu-btn');
+  var soundBtn = document.getElementById('pg-sound-btn');
+  var brand    = document.getElementById('pg-hero-brand');
+  var title1   = document.getElementById('pg-title-1');
+  var title2   = document.getElementById('pg-title-2');
+  var title3   = document.getElementById('pg-title-3');
+  var lede     = document.getElementById('pg-lede');
+  var actions  = document.getElementById('pg-actions');
+  var scrollCue = document.getElementById('pg-scroll-cue');
+
+  // Tree paths for stroke-dashoffset animation [SPEC: 7 paths]
+  var treePaths = logo ? logo.querySelectorAll('path[stroke]') : [];
+
+  // Hidden elements [SPEC: logo, nav, sound, menu, brand, title, lede, actions, cue are opacity 0]
+  var hiddenEls = [logo, nav, soundBtn, menuBtn, brand, title1, title2, title3, lede, actions, scrollCue];
+
+  // ── Reduced motion: show finished page immediately [SPEC] ─────────────────
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    showFinished();
+    return;
+  }
+
+  // Apply hidden state
+  hiddenEls.forEach(function(el) { if (el) el.classList.add('pg-entrance-hidden'); });
+  treePaths.forEach(function(p) {
+    var len = p.getTotalLength ? p.getTotalLength() : 40;
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+
+  // ── Failsafe [SPEC: 3.5s] ────────────────────────────────────────────────
+  var failsafe = setTimeout(function() {
+    showFinished();
+  }, FAILSAFE_MS);
+
+  // ── Wait for fonts + video data [SPEC: one pass after fonts ready AND video loaded] ─
+  var fontsReady = false;
+  var videoReady = false;
+
+  function tryStart() {
+    if (fontsReady && videoReady) {
+      clearTimeout(failsafe);
+      runEntrance();
+    }
+  }
+
+  // Fonts [SPEC: after fonts ready]
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function() { fontsReady = true; tryStart(); });
+  } else {
+    fontsReady = true;
+  }
+
+  // Video [SPEC: after video data loaded; check readyState first per diagnosis P2]
+  if (video.readyState >= 2) {
+    videoReady = true;
+    tryStart();
+  } else {
+    video.addEventListener('loadeddata', function handler() {
+      video.removeEventListener('loadeddata', handler);
+      videoReady = true;
+      tryStart();
+    });
+    // [SPEC: failsafe handles the case where video never loads]
+  }
+
+  // ── Entrance timeline [SPEC: Web Animations API, fill backwards, then remove classes] ─
+  function runEntrance() {
+    var anims = [];
+
+    // Compute travel scale [SPEC: scale with CTA height / 46, ×0.8 below 650px]
+    var ctaEl = document.querySelector('.pg-cta-pill');
+    var ctaH = ctaEl ? ctaEl.offsetHeight : 46;
+    var scaleF = ctaH / 46;
+    var isMobile = window.innerWidth < 650;
+    if (isMobile) scaleF *= 0.8;
+    function travel(n) { return Math.round(n * scaleF) + 'px'; }
+
+    // Helper
+    function anim(el, keyframes, options) {
+      if (!el) return null;
+      el.classList.remove('pg-entrance-hidden');
+      var a = el.animate(keyframes, options);
+      anims.push(a);
+      return a;
+    }
+
+    // ── Logo [SPEC: 0ms, 500ms, quart] ──────────────────────────────────
+    anim(logo, [
+      { opacity: 0, offset: 0 },
+      { opacity: 1, offset: 1 }
+    ], { duration: 500, delay: 0, easing: EASE_QUART, fill: 'backwards' });
+
+    // ── Tree strokes [SPEC: 80ms + 45ms per path, 820ms, grow ease] ─────
+    treePaths.forEach(function(p, i) {
+      var delay = 80 + i * 45; // [SPEC]
+      var a = p.animate([
+        { strokeDashoffset: p.getTotalLength ? p.getTotalLength() : 40 },
+        { strokeDashoffset: 0 }
+      ], { duration: 820, delay: delay, easing: EASE_GROW, fill: 'backwards' }); // [SPEC: 820ms, grow]
+      anims.push(a);
+    });
+
+    // ── Moth [SPEC: 420ms, 650ms, expo, scale from 0.92] ──────────────
+    var moth = logo ? logo.querySelector('.pg-logo-moth') : null;
+    if (moth) {
+      moth.style.opacity = '0';
+      anim(moth, [
+        { opacity: 0, transform: 'scale(0.92)', offset: 0 }, // [SPEC: scale from 0.92]
+        { opacity: 1, transform: 'scale(1)',    offset: 1 }
+      ], { duration: 650, delay: 420, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 420ms, 650ms, expo]
+    }
+
+    // ── Nav / menu [SPEC: 120ms, 700ms, expo, lifts 8px] ────────────────
+    var navEl = window.innerWidth < 650 ? menuBtn : nav;
+    anim(navEl, [
+      { opacity: 0, transform: 'translateY(' + travel(8) + ')', offset: 0 }, // [SPEC: lifts 8px]
+      { opacity: 1, transform: 'translateY(0)', offset: 1 }
+    ], { duration: 700, delay: 120, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 120ms, 700ms, expo]
+
+    // ── Nav links ripple [SPEC: 260ms, 45ms apart, lifts 4px] ──────────
+    var navLinks = nav ? nav.querySelectorAll('.pg-nav-link') : [];
+    navLinks.forEach(function(link, i) {
+      var delay = 260 + i * 45; // [SPEC: 260ms, 45ms stagger]
+      anim(link, [
+        { opacity: 0, transform: 'translateY(' + travel(4) + ')', offset: 0 }, // [SPEC: 4px lift]
+        { opacity: 1, transform: 'translateY(0)', offset: 1 }
+      ], { duration: 400, delay: delay, easing: EASE_EXPO, fill: 'backwards' }); // [ASSUMED: 400ms]
+    });
+
+    // ── Sound button [SPEC: 200ms, 8px lift] ─────────────────────────────
+    anim(soundBtn, [
+      { opacity: 0, transform: 'translateY(' + travel(8) + ')', offset: 0 }, // [SPEC: 8px]
+      { opacity: 1, transform: 'translateY(0)', offset: 1 }
+    ], { duration: 700, delay: 200, easing: EASE_EXPO, fill: 'backwards' }); // [ASSUMED: 700ms, SPEC: 200ms delay]
+
+    // ── Brand [SPEC: 300ms, 10px, 650ms] ─────────────────────────────────
+    anim(brand, [
+      { opacity: 0, transform: 'translateY(' + travel(10) + ')', offset: 0 }, // [SPEC: 10px]
+      { opacity: 1, transform: 'translateY(0)', offset: 1 }
+    ], { duration: 650, delay: 300, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 300ms, 650ms]
+
+    // ── Title lines [SPEC: 380ms, +90ms per line, 1050ms, translateY(115%) inside clip mask] ─
+    [[title1, 380], [title2, 470], [title3, 560]].forEach(function(pair) {
+      var el = pair[0], delay = pair[1]; // [SPEC: 380ms + 90ms per line]
+      anim(el, [
+        { transform: 'translateY(115%)', offset: 0 }, // [SPEC]
+        { transform: 'translateY(0)',    offset: 1 }
+      ], { duration: 1050, delay: delay, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 1050ms]
+    });
+
+    // ── Lede [SPEC: 800ms and 860ms, 14px, 800ms] ────────────────────────
+    var ledeLines = lede ? lede.querySelectorAll('.pg-lede__line') : [];
+    ledeLines.forEach(function(line, i) {
+      var delay = 800 + i * 60; // [SPEC: 800ms and 860ms = 60ms apart]
+      anim(line, [
+        { opacity: 0, transform: 'translateY(' + travel(14) + ')', offset: 0 }, // [SPEC: 14px]
+        { opacity: 1, transform: 'translateY(0)', offset: 1 }
+      ], { duration: 800, delay: delay, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 800ms]
+    });
+    // Also show the lede container
+    if (lede) {
+      lede.classList.remove('pg-entrance-hidden');
+      lede.style.opacity = '';
+    }
+
+    // ── CTA [SPEC: 1000ms, 12px, 800ms] ─────────────────────────────────
+    anim(actions, [
+      { opacity: 0, transform: 'translateY(' + travel(12) + ')', offset: 0 }, // [SPEC: 12px]
+      { opacity: 1, transform: 'translateY(0)', offset: 1 }
+    ], { duration: 800, delay: 1000, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 1000ms, 800ms]
+
+    // Text link [SPEC: 1100ms, 8px, 600ms, quart]
+    var textLink = document.querySelector('.pg-text-link');
+    if (textLink) {
+      anim(textLink, [
+        { opacity: 0, transform: 'translateY(' + travel(8) + ')', offset: 0 }, // [SPEC: 8px]
+        { opacity: 1, transform: 'translateY(0)', offset: 1 }
+      ], { duration: 600, delay: 1100, easing: EASE_QUART, fill: 'backwards' }); // [SPEC: 1100ms, 600ms, quart]
+    }
+
+    // ── Scroll cue [SPEC: 1250ms, from -6px, 700ms] ──────────────────────
+    anim(scrollCue, [
+      { opacity: 0, transform: 'translateY(' + travel(-6) + ')', offset: 0 }, // [SPEC: -6px (lifts from below)]
+      { opacity: 1, transform: 'translateY(0)', offset: 1 }
+    ], { duration: 700, delay: 1250, easing: EASE_EXPO, fill: 'backwards' }); // [SPEC: 1250ms, 700ms]
+
+    // Wait for all to finish, then force one-frame redraw [SPEC] and remove classes
+    var last = anims.filter(Boolean).sort(function(a, b) {
+      return (a.effect ? a.effect.getTiming().delay + a.effect.getTiming().duration : 0) -
+             (b.effect ? b.effect.getTiming().delay + b.effect.getTiming().duration : 0);
+    }).pop();
+
+    if (last) {
+      last.finished.then(function() {
+        // Remove all hidden classes so no inline style remains [SPEC]
+        hiddenEls.forEach(function(el) { if (el) el.classList.remove('pg-entrance-hidden'); });
+        // Force one-frame redraw of logo and action row [SPEC]
+        if (logo) { void logo.offsetHeight; }
+        if (actions) { void actions.offsetHeight; }
+      }).catch(function() {});
+    }
+  }
+
+  function showFinished() {
+    hiddenEls.forEach(function(el) { if (el) el.classList.remove('pg-entrance-hidden'); });
+    // Reset tree paths
+    treePaths.forEach(function(p) {
+      p.style.strokeDasharray = '';
+      p.style.strokeDashoffset = '';
+    });
+  }
+
+  // ── Sound button toggle [SPEC: aria-pressed toggle, waves opacity .25 when false, no audio] ─
+  soundBtn && soundBtn.addEventListener('click', function() {
+    var pressed = this.getAttribute('aria-pressed') === 'true';
+    this.setAttribute('aria-pressed', pressed ? 'false' : 'true');
+  });
+
+  // ── Mobile menu behavior [SPEC: toggle, Escape closes + returns focus to button,
+  //    outside click closes, link click closes, first link focused on open] ─────
+  var mobileNav    = document.getElementById('pg-mobile-nav');
+  var menuBarsIcon = document.getElementById('pg-menu-bars');
+  var menuXIcon    = document.getElementById('pg-menu-x');
+
+  function openMenu() {
+    if (!mobileNav || !menuBtn) return;
+    menuBtn.setAttribute('aria-expanded', 'true');
+    mobileNav.classList.add('is-open');
+    mobileNav.setAttribute('aria-hidden', 'false');
+    if (menuBarsIcon) menuBarsIcon.style.display = 'none';
+    if (menuXIcon)    menuXIcon.style.display    = '';
+    // Focus first link [SPEC]
+    var firstLink = mobileNav.querySelector('a, button');
+    if (firstLink) firstLink.focus();
+  }
+
+  function closeMenu() {
+    if (!mobileNav || !menuBtn) return;
+    menuBtn.setAttribute('aria-expanded', 'false');
+    mobileNav.classList.remove('is-open');
+    mobileNav.setAttribute('aria-hidden', 'true');
+    if (menuBarsIcon) menuBarsIcon.style.display = '';
+    if (menuXIcon)    menuXIcon.style.display    = 'none';
+    // Return focus to button [SPEC]
+    menuBtn.focus();
+  }
+
+  menuBtn && menuBtn.addEventListener('click', function() {
+    var isOpen = this.getAttribute('aria-expanded') === 'true';
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  // Escape closes menu [SPEC]
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && menuBtn && menuBtn.getAttribute('aria-expanded') === 'true') {
+      closeMenu();
+    }
+  });
+
+  // Outside click closes [SPEC]
+  document.addEventListener('click', function(e) {
+    if (mobileNav && menuBtn &&
+        !mobileNav.contains(e.target) &&
+        !menuBtn.contains(e.target) &&
+        menuBtn.getAttribute('aria-expanded') === 'true') {
+      closeMenu();
+    }
+  });
+
+  // Link click closes [SPEC]
+  mobileNav && mobileNav.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() { closeMenu(); });
+  });
+
+})();
+</script>
+</body>
+</html>
